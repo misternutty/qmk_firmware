@@ -112,5 +112,5 @@ $ make sol:nutty
 
 After the initial flash with AVRdudess, you should be able to flash using this:
 ```
-$ make sol:default:dfu
+$ make sol:nutty:dfu
 ```

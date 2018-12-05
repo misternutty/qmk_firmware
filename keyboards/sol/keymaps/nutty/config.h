@@ -23,3 +23,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // place overrides here
 
+#define GRAVE_ESC_CTRL_OVERRIDE

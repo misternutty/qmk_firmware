@@ -45,6 +45,7 @@ enum macro_keycodes {
 #define FN_CAPS  LT(_FN, KC_CAPS)
 
 // Define your non-alpha grouping in this define's LAYOUT, and all your BASE_LAYERS will share the same mod/macro columns
+// Since colemak was removed this setup is no longer leveraged. I'm leaving it just in case alpha only layers are desired later.
   /* Base Layout
    * ,------------------------------------------------.  ,------------------------------------------------.
    * | GESC |      |      |      |      |      |   -  |  |   =  |      |      |      |      |      | BkSp |
