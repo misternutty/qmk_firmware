@@ -24,13 +24,16 @@ extern uint8_t is_master;
 enum layer_number {
     _QWERTY = 0,
     _FN,
-    _ADJ
+    _ADJ,
+    _GAME
 };
 
 enum custom_keycodes {
   QWERTY = SAFE_RANGE,
   FN,
   ADJ,
+  GAMEON,
+  GAMEOFF,
   BACKLIT,
   RGBRST
 };
@@ -43,12 +46,15 @@ enum macro_keycodes {
 
 #define FN_ESC  LT(_FN, KC_ESC)
 #define FN_CAPS  LT(_FN, KC_CAPS)
+#define NVR_TOG LALT(KC_F9)
+#define NVIR_SAVE LALT(KC_F10)
+#define NVIR_TOG LALT(LSFT(KC_F10))
 
 // Define your non-alpha grouping in this define's LAYOUT, and all your BASE_LAYERS will share the same mod/macro columns
 // Since colemak was removed this setup is no longer leveraged. I'm leaving it just in case alpha only layers are desired later.
   /* Base Layout
    * ,------------------------------------------------.  ,------------------------------------------------.
-   * | GESC |      |      |      |      |      |   -  |  |   =  |      |      |      |      |      | BkSp |
+   * | GESC |   1  |   2  |   3  |   4  |   5  |   -  |  |   =  |   6  |   7  |   8  |   9  |   0  | BkSp |
    * |------+------+------+------+------+------|------|  |------|------+------+------+------+------+------|
    * | Tab  |      |      |      |      |      |   [  |  |   ]  |      |      |      |      |      |   \  |
    * |------+------+------+------+------+------|------|  |------|------+------+------+------+------+------|
@@ -78,7 +84,7 @@ LAYOUT( \
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   /* Qwerty
    * ,------------------------------------------------.  ,------------------------------------------------.
-   * |      |      |      |      |      |      |      |  |      |      |      |      |      |      |      |
+   * |      |   1  |   2  |   3  |   4  |   5  |      |  |      |      |      |      |      |      |      |
    * |------+------+------+------+------+------|------|  |------|------+------+------+------+------+------|
    * |      |   Q  |   W  |   E  |   R  |   T  |      |  |      |   Y  |   U  |   I  |   O  |   P  |      |
    * |------+------+------+------+------+------|------|  |------|------+------+------+------+------+------|
@@ -130,9 +136,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * |------+------+------+------+------+------|------|  |------|------+------+------+------+------+------|
    * |      | HUD  | VAD  | HUI  |RGBRST|      |      |  |      |      |      |      |      |      |      |
    * |------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-   * |      |      |      |      |      |      |      |  |      |      |      |RGBTOG|  HUI |  SAI | VAI  |
+   * |      |      |      |      |      |      |GAMEON|  |      |      |      |RGBTOG|  HUI |  SAI | VAI  |
    * |------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-   * |      |      |      |RGBMOD(|      |      |      |  |      |      |     |RGBRMOD| HUD |  SAD | VAD  |
+   * |      |      |      |RGBMOD(|     |      |      |  |      |      |      |RGBRMOD| HUD |  SAD | VAD  |
    * `------+------+------+------+------+------+------|  |------+------+------+------+------+------+------'
    *                                    |      |      |  |      |      |
    *                                    `-------------'  `-------------'
@@ -142,9 +148,34 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   _______, _______, KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12, \
       _______, RGB_SAD, RGB_VAI, RGB_SAI, RESET,   _______, _______, _______, _______, _______, _______, _______, _______, _______, \
       _______, RGB_HUD, RGB_VAD, RGB_HUI, RGBRST,  _______, _______, _______, _______, _______,  _______, _______, _______, _______, \
-      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, RGB_TOG, RGB_HUI, RGB_SAI, RGB_VAI, \
+      _______, _______, _______, _______, _______, _______,  GAMEON, _______, _______, _______, RGB_TOG, RGB_HUI, RGB_SAI, RGB_VAI, \
       _______, _______, _______, RGB_MOD, _______, _______, _______, _______, _______, _______, RGB_RMOD,RGB_HUD, RGB_SAD, RGB_VAD, \
                         KC_VOLU, KC_VOLD,          _______, _______, _______, _______,          KC_VOLU, KC_VOLD \
+      ),
+  
+  /* GAME
+   * ,------------------------------------------------.  ,------------------------------------------------.
+   * |  ESC |   1  |   2  |   3  |   4  |   5  |      |  | R_TOG|      |      |      |      |      |      |
+   * |------+------+------+------+------+------|------|  |------|------+------+------+------+------+------|
+   * |  TAB |   Q  |   W  |   E  |   R  |   T  |      |  |IR_TOG|      |      |      |      |      |      |
+   * |------+------+------+------+------+------|------|  |------|------+------+------+------+------+------|
+   * | SHIFT|   A  |   S  |   D  |   F  |   G  |      |  |      |      |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
+   * | SHIFT|   Z  |   X  |   C  |   V  |   B  |IRSAVE|  |GAMEOFF|     |      |      |      |      |      |
+   * |------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
+   * | CTRL | CTRL |  ALT |  ALT |  ALT | Space|  DEL |  |      |      |      |      |      |      |      |
+   * `------+------+------+------+------+------+------|  |------+------+------+------+------+------+------'
+   *                                    | Space|  DEL |  |      |      |
+   *                                    `-------------'  `-------------'
+   */
+
+  [_GAME] =  LAYOUT( \
+       KC_ESC,    KC_1,    KC_2,    KC_3,    KC_4,    KC_5, _______, NVR_TOG, _______, _______, _______, _______, _______, _______, \
+       KC_TAB,    KC_Q,    KC_W,    KC_E,    KC_R,    KC_T, _______, NVIR_TOG,_______, _______, _______, _______, _______, _______, \
+      KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,    KC_G, _______, _______, _______, _______, _______, _______, _______, _______, \
+      KC_LSFT,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B, NVIR_SAVE,GAMEOFF,_______, _______, _______, _______, _______, _______, \
+      KC_LCTL, KC_LCTL, KC_LALT, KC_LALT, KC_LALT,  KC_SPC,  KC_DEL, _______, _______, _______, _______, _______, _______, _______, \
+                        _______, _______,           KC_SPC,  KC_DEL, _______, _______,          _______, _______ \
       )
 };
 
@@ -206,6 +237,20 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         return false;
         break;
       //led operations - RGB mode change now updates the RGB_current_mode to allow the right RGB mode to be set after reactive keys are released
+    case GAMEON:
+        if (record->event.pressed) {
+          layer_on(_GAME);
+        } else {
+        }
+        return false;
+        break;
+    case GAMEOFF:
+        if (record->event.pressed) {
+          layer_off(_GAME);
+        } else {
+        }
+        return false;
+        break;
     case RGBRST:
       #ifdef RGBLIGHT_ENABLE
         if (record->event.pressed) {
